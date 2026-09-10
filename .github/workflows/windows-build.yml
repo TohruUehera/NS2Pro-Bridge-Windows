@@ -51,7 +51,7 @@ jobs:
         run: |
           $version = ./.venv/Scripts/python.exe -c "import ns2pro_bridge; print(ns2pro_bridge.__version__)"
           "version=$version" >> $env:GITHUB_OUTPUT
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: NS2ProBridge-v${{ steps.version.outputs.version }}-Windows
           path: dist/v${{ steps.version.outputs.version }}/
