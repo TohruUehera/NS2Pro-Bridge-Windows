@@ -4,7 +4,7 @@
 
 让 Nintendo Switch 2 Pro Controller 在 Windows 11 上通过蓝牙连接，并可选择向 Steam/PC 游戏提供虚拟 Xbox 360 手柄，或真正以 USB `VID 057E / PID 2069` 的 Nintendo Switch 2 Pro Controller 身份出现。
 
-Windows 的“添加蓝牙设备”看不到它是正常现象：手柄使用 Bluetooth LE 私有 GATT 协议，广播中没有普通设备名称。本程序直接扫描 Nintendo 厂商数据、连接手柄并翻译输入，不需要先在 Windows 设置中配对，也不需要 Switch 2 主机。
+Windows “添加蓝牙设备”不显示目标为正常现象：手柄使用 Bluetooth LE 私有 GATT 协议，广播中没有普通设备名称。本程序直接扫描 Nintendo 厂商数据、连接手柄并翻译输入，不需要先在 Windows 设置中配对，也不需要 Switch 2 主机。
 
 ## 当前功能
 
