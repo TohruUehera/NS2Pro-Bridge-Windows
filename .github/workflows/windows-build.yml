@@ -28,8 +28,7 @@ jobs:
         run: |
           python -m venv .venv
           ./.venv/Scripts/python.exe -m pip install --upgrade pip
-          # This is vgamepad's documented non-interactive installation switch.
-          $env:VGAMEPAD_SKIP_VIGEMBUS_INSTALL = "true"
+          ./scripts/install-vgamepad.ps1 -PythonPath ./.venv/Scripts/python.exe
           ./.venv/Scripts/python.exe -m pip install -e ".[dev]"
       - name: Test
         shell: pwsh

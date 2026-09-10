@@ -52,10 +52,14 @@ this MIT-licensed distribution.
 
 Xbox virtual-controller output uses the MIT-licensed `vgamepad` 0.1.0 package
 by Yann Bouteiller. PyInstaller includes its Python modules and x64
-ViGEmClient library in the release executable.
+ViGEmClient library in the release executable. The x86 client and the two
+upstream ViGEmBus installer MSI files are deliberately excluded.
 
 - Source: https://github.com/yannbouteiller/vgamepad
 - PyPI: https://pypi.org/project/vgamepad/0.1.0/
+- PyPI sdist SHA-256: `57F6BD01AEC0C172947517FB782D150EF9B285F7F4D524C317374FA5C24A89DE`
+- Build modification: the packaging script's `msiexec` call is replaced with
+  a warning so dependency installation cannot install an obsolete driver.
 - Copyright (c) 2021 Yann Bouteiller
 - License: MIT (full terms: `licenses/VGAMEPAD-0.1.0-MIT.txt`)
 

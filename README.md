@@ -104,7 +104,7 @@ GL/GR 使用 F13/F14 时保持为两个独立输入，可在支持键盘绑定�
 
 版本变更记录见 [`CHANGELOG.md`](CHANGELOG.md)，发布步骤见 [`RELEASING.md`](RELEASING.md)。推送 `v*` Git 标签后，GitHub Actions 会测试、构建 Windows EXE 并创建对应 Release。
 
-CI 使用 vgamepad 官方提供的 `VGAMEPAD_SKIP_VIGEMBUS_INSTALL=true` 开关避免在无人值守 Runner 中启动驱动安装器；最终 EXE 仍要求用户自行安装 ViGEmBus。
+PyPI 的 vgamepad 0.1.0 源码包会在构建 wheel 时尝试启动旧版 ViGEmBus MSI。本项目的安装脚本下载并验证固定 SHA-256 的上游源码，以可审计的一行补丁禁用该安装副作用，再在本机即时构建 wheel；仓库不提交预构建 wheel。最终 EXE 仍要求用户自行安装文档指定的 ViGEmBus。
 
 架构：
 

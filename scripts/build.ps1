@@ -53,8 +53,20 @@ VSVersionInfo(
         "--distpath", $ResolvedDistPath
         "--version-file", $VersionInfoPath
         "--collect-all", "bleak"
-        "--collect-all", "vgamepad"
         "--paths", "src"
+    )
+    $VgamepadRoot = & $VenvPython -c `
+        "import importlib.metadata as m; print(m.distribution('vgamepad').locate_file('vgamepad'))"
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($VgamepadRoot)) {
+        throw "无法定位 vgamepad 安装目录。"
+    }
+    $VigemClient = Join-Path $VgamepadRoot.Trim() `
+        "win\vigem\client\x64\ViGEmClient.dll"
+    if (-not (Test-Path -LiteralPath $VigemClient)) {
+        throw "找不到 vgamepad 的 x64 ViGEmClient.dll。"
+    }
+    $PyInstallerArgs += @(
+        "--add-binary", "$VigemClient;vgamepad\win\vigem\client\x64"
     )
     $ViiperRuntime = Join-Path $ProjectRoot "runtime\viiper-haptic.exe"
     $ViiperLicense = Join-Path $ProjectRoot "runtime\VIIPER_LICENSE.txt"
@@ -77,6 +89,15 @@ VSVersionInfo(
 }
 finally {
     Pop-Location
+}
+
+$ArchiveListing = & $VenvPython -m PyInstaller.utils.cliutils.archive_viewer `
+    -l (Join-Path $ResolvedDistPath "$ExeName.exe")
+if ($ArchiveListing -match "(?i)\.msi(?:'|$)") {
+    throw "发布包不得包含驱动 MSI。"
+}
+if (-not ($ArchiveListing -match "vgamepad.+client.+x64.+ViGEmClient\.dll")) {
+    throw "发布包缺少 x64 ViGEmClient.dll。"
 }
 
 $ReleaseDocuments = @(

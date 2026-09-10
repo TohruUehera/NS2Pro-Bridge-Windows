@@ -7,7 +7,7 @@ if (-not (Test-Path $VenvPython)) {
 }
 
 & $VenvPython -m pip install --upgrade pip
-$env:VGAMEPAD_SKIP_VIGEMBUS_INSTALL = "true"
+& (Join-Path $PSScriptRoot "install-vgamepad.ps1") -PythonPath $VenvPython
 & $VenvPython -m pip install -e "$ProjectRoot[dev]"
 
 Write-Host ""

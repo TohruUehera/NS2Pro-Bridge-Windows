@@ -15,7 +15,8 @@
 
 - 广播识别允许官方格式修订字节变化，同时继续严格限定 Nintendo 厂商 ID 与 Pro2 PID。
 - 系统托盘改用 Windows Shell 原生 API，移除 Pillow 和 LGPL pystray 依赖。
-- CI 使用 vgamepad 官方非交互安装开关，不再提交预构建 wheel。
+- CI 从固定 SHA-256 的 vgamepad 0.1.0 上游源码即时构建 wheel，并以可审计补丁禁用旧驱动 MSI；不再提交预构建 wheel。
+- 发布 EXE 只收集运行所需的 x64 ViGEmClient DLL，明确拒绝打包上游旧版驱动 MSI 和无关的 x86 客户端。
 
 [0.6.0]: https://github.com/TohruUehera/NS2Pro-Bridge-Windows/compare/v0.5.1...v0.6.0
 
