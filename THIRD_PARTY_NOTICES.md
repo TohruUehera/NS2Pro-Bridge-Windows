@@ -42,6 +42,18 @@ this MIT-licensed distribution.
 - S2P-XInput-Lite by duoduo-88 (GNU General Public License v3.0):
   https://github.com/duoduo-88/S2P-XInput-Lite
 
+## vgamepad 0.1.0
+
+Xbox virtual-controller output uses and redistributes a wheel built without
+modification from the MIT-licensed `vgamepad` 0.1.0 source distribution by
+Yann Bouteiller. The wheel is pinned under `vendor/` for reproducible,
+non-interactive CI builds.
+
+- Source: https://github.com/yannbouteiller/vgamepad
+- PyPI: https://pypi.org/project/vgamepad/0.1.0/
+- Vendored wheel SHA-256:
+  `42D8A9E1532235306C2111EE481867E3DF2F5E02C03C22A06AC7B39D1454E2C5`
+
 ## VIIPER Haptic v0.8.0 optional runtime
 
 The packaged application contains `viiper-haptic.exe` from the
