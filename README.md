@@ -1,6 +1,6 @@
 # NS2 Pro 无线桥接
 
-当前版本：**v0.5.0** · [更新日志](CHANGELOG.md) · [发布流程](RELEASING.md)
+当前版本：**v0.5.1** · [更新日志](CHANGELOG.md) · [发布流程](RELEASING.md)
 
 让 Nintendo Switch 2 Pro Controller 在 Windows 11 上通过蓝牙连接，并可选择向 Steam/PC 游戏提供虚拟 Xbox 360 手柄，或真正以 USB `VID 057E / PID 2069` 的 Nintendo Switch 2 Pro Controller 身份出现。
 
@@ -101,6 +101,8 @@ GL/GR 使用 F13/F14 时保持为两个独立输入，可在支持键盘绑定�
 ```
 
 版本变更记录见 [`CHANGELOG.md`](CHANGELOG.md)，发布步骤见 [`RELEASING.md`](RELEASING.md)。推送 `v*` Git 标签后，GitHub Actions 会测试、构建 Windows EXE 并创建对应 Release。
+
+`vendor/vgamepad-0.1.0-py3-none-any.whl` 是从官方 MIT 源码包构建的固定 CI 依赖。PyPI 的源码包在生成元数据时会尝试启动交互式 ViGEmBus MSI，无法用于无人值守 Runner；预装 wheel 只跳过该安装副作用，最终 EXE 仍要求用户自行安装 ViGEmBus。
 
 架构：
 
