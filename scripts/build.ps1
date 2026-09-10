@@ -53,7 +53,6 @@ VSVersionInfo(
         "--distpath", $ResolvedDistPath
         "--version-file", $VersionInfoPath
         "--collect-all", "bleak"
-        "--collect-all", "pystray"
         "--collect-all", "vgamepad"
         "--paths", "src"
     )
@@ -80,8 +79,43 @@ finally {
     Pop-Location
 }
 
+$ReleaseDocuments = @(
+    "LICENSE",
+    "README.md",
+    "COMPATIBILITY.md",
+    "LEGAL.md",
+    "SECURITY.md",
+    "THIRD_PARTY_NOTICES.md"
+)
+foreach ($Document in $ReleaseDocuments) {
+    Copy-Item -LiteralPath (Join-Path $ProjectRoot $Document) `
+        -Destination (Join-Path $ResolvedDistPath $Document) -Force
+}
 Copy-Item -LiteralPath (Join-Path $ProjectRoot "runtime\VIIPER_LICENSE.txt") `
     -Destination (Join-Path $ResolvedDistPath "VIIPER_LICENSE.txt") -Force
-Copy-Item -LiteralPath (Join-Path $ProjectRoot "THIRD_PARTY_NOTICES.md") `
-    -Destination (Join-Path $ResolvedDistPath "THIRD_PARTY_NOTICES.md") -Force
+$LicenseSource = Join-Path $ProjectRoot "third_party\licenses"
+$LicenseDestination = Join-Path $ResolvedDistPath "licenses"
+if (Test-Path -LiteralPath $LicenseSource) {
+    New-Item -ItemType Directory -Path $LicenseDestination -Force | Out-Null
+    foreach ($LicenseFile in Get-ChildItem -LiteralPath $LicenseSource -File) {
+        Copy-Item -LiteralPath $LicenseFile.FullName -Destination $LicenseDestination -Force
+    }
+}
+$CorrespondingSource = Join-Path $ProjectRoot `
+    "third_party\source\XinHeLianSheng-Pro2-Bridge-b274daa-source.zip"
+if (Test-Path -LiteralPath $CorrespondingSource) {
+    Copy-Item -LiteralPath $CorrespondingSource -Destination $ResolvedDistPath -Force
+}
+$PackagePath = Join-Path $ResolvedDistPath "$ExeName-Windows-x64.zip"
+$PackageInputs = @(
+    (Join-Path $ResolvedDistPath "$ExeName.exe"),
+    (Join-Path $ResolvedDistPath "VIIPER_LICENSE.txt")
+)
+$PackageInputs += $ReleaseDocuments | ForEach-Object {
+    Join-Path $ResolvedDistPath $_
+}
+if (Test-Path -LiteralPath $LicenseDestination) {
+    $PackageInputs += $LicenseDestination
+}
+Compress-Archive -LiteralPath $PackageInputs -DestinationPath $PackagePath -Force
 Write-Host "构建完成：$(Join-Path $ResolvedDistPath "$ExeName.exe")"

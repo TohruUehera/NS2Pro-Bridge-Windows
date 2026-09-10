@@ -14,6 +14,7 @@ from tkinter.scrolledtext import ScrolledText
 from . import __version__
 from .ble_bridge import BridgeWorker
 from .special_buttons import DEFAULT_SPECIAL_MAPPINGS
+from .tray import WindowsTrayIcon
 
 VIGEM_URL = "https://github.com/nefarius/ViGEmBus/releases/tag/v1.22.0"
 VIIPER_URL = "https://github.com/LeonChrome/XinHeLianSheng-Pro2-Bridge/releases"
@@ -209,7 +210,7 @@ class BridgeApp(tk.Tk):
         self._refresh_output_controls()
 
         if sys.platform != "win32":
-            self.after(0, lambda: messagebox.showerror("不支持的平台", "此程序仅支持 Windows 10/11。"))
+            self.after(0, lambda: messagebox.showerror("不支持的平台", "此程序仅支持 Windows 11。"))
 
     def _connect(self) -> None:
         if self._worker is not None and self._worker.running:
@@ -254,7 +255,9 @@ class BridgeApp(tk.Tk):
             label = f"{label} · {detail}"
         self._status_label.configure(text=label)
         if self._tray_icon is not None:
-            self._tray_icon.title = f"NS2 Pro 无线桥接 v{__version__} - {label}"
+            self._tray_icon.set_title(
+                f"NS2 Pro 无线桥接 v{__version__} - {label}"
+            )
         if state == "stopped":
             self._connect_button.configure(state="normal")
             self._disconnect_button.configure(state="disabled")
@@ -337,51 +340,22 @@ class BridgeApp(tk.Tk):
             self._last_packet_count = current
         self.after(1000, self._poll_rate)
 
-    @staticmethod
-    def _tray_image():
-        from PIL import Image, ImageDraw
-
-        image = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(image)
-        draw.rounded_rectangle((5, 12, 59, 52), radius=15, fill="#24292f")
-        draw.ellipse((11, 22, 27, 38), outline="#ffffff", width=4)
-        draw.line((19, 19, 19, 41), fill="#ffffff", width=4)
-        draw.ellipse((39, 20, 47, 28), fill="#2ea043")
-        draw.ellipse((47, 28, 55, 36), fill="#58a6ff")
-        return image
-
     def _ensure_tray_icon(self) -> bool:
         if self._tray_icon is not None:
             return True
         try:
-            import pystray
             def send(action: str) -> None:
                 self._events.put(("tray", action))
 
-            menu = pystray.Menu(
-                pystray.MenuItem(
-                    "显示主窗口", lambda _icon, _item: send("show"), default=True
-                ),
-                pystray.MenuItem(
-                    "释放给 NS2",
-                    lambda _icon, _item: send("disconnect"),
-                    enabled=lambda _item: (
-                        self._worker is not None and self._worker.running
-                    ),
-                ),
-                pystray.Menu.SEPARATOR,
-                pystray.MenuItem("完全退出", lambda _icon, _item: send("exit")),
-            )
-            self._tray_icon = pystray.Icon(
-                f"NS2ProBridge-v{__version__}",
-                self._tray_image(),
+            self._tray_icon = WindowsTrayIcon(
                 (
                     f"NS2 Pro 无线桥接 v{__version__} - "
                     f"{STATE_LABELS.get(self._state, self._state)}"
                 ),
-                menu,
+                send,
+                lambda: self._worker is not None and self._worker.running,
             )
-            self._tray_icon.run_detached()
+            self._tray_icon.start()
         except Exception as exc:
             self._tray_icon = None
             self._append_log(

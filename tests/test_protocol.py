@@ -29,6 +29,11 @@ def test_matches_exact_switch2_pro_advertisement() -> None:
     assert switch2_pro_product_id({NINTENDO_MANUFACTURER_ID: data}) == SWITCH2_PRO_PRODUCT_ID
 
 
+def test_accepts_updated_advertisement_format_revision() -> None:
+    data = bytes((0x01, 0x00, 0x03, 0x7E, 0x7F, 0x69, 0x20, 0xAA))
+    assert switch2_pro_product_id({NINTENDO_MANUFACTURER_ID: data}) == SWITCH2_PRO_PRODUCT_ID
+
+
 @pytest.mark.parametrize(
     "data",
     (

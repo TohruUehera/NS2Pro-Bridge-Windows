@@ -1,14 +1,16 @@
 # NS2 Pro 无线桥接
 
-当前版本：**v0.5.1** · [更新日志](CHANGELOG.md) · [发布流程](RELEASING.md)
+当前版本：**v0.6.0** · [兼容范围](COMPATIBILITY.md) · [权利与许可审计](LEGAL.md) · [更新日志](CHANGELOG.md)
 
 让 Nintendo Switch 2 Pro Controller 在 Windows 11 上通过蓝牙连接，并可选择向 Steam/PC 游戏提供虚拟 Xbox 360 手柄，或真正以 USB `VID 057E / PID 2069` 的 Nintendo Switch 2 Pro Controller 身份出现。
 
-Windows “添加蓝牙设备”不显示目标为正常现象：手柄使用 Bluetooth LE 私有 GATT 协议，广播中没有普通设备名称。本程序直接扫描 Nintendo 厂商数据、连接手柄并翻译输入，不需要先在 Windows 设置中配对，也不需要 Switch 2 主机。
+Windows “添加蓝牙设备”不显示目标为正常现象：手柄使用 Bluetooth LE 私有 GATT 协议，广播中没有普通设备名称。本程序直接扫描 Nintendo 厂商数据、连接手柄并翻译输入，不需要先在 Windows 设置中配对。全新手柄仍应先在 Switch 2 上完成一次官方初始化与固件更新；此后 PC 桥接不要求主机保持连接。
+
+这是非官方互操作项目，与 Nintendo、Valve、Microsoft 或第三方驱动作者无隶属、授权或背书关系。Nintendo Switch 及相关名称是其各自权利人的商标；名称仅用于说明兼容对象。项目不包含 Nintendo 固件、密钥、图形素材或机密 SDK。
 
 ## 当前功能
 
-- 只匹配 Nintendo 厂商 ID `0x0553` 和 Switch 2 Pro PID `0x2069`，不会误连附近的 Joy-Con 2。
+- 只匹配 Nintendo 厂商 ID `0x0553` 和 Switch 2 Pro PID `0x2069`，同时容忍广播格式修订字节变化，不会误连附近的 Joy-Con 2。
 - 支持蓝牙扫描、连接、断线后重新扫描。
 - 连接或扫描期间，点击最小化或窗口关闭按钮会隐藏到系统托盘，桥接继续在后台运行；托盘菜单可恢复窗口、释放给 NS2 或完全退出。
 - 采用非持久 GATT 会话，不写电脑地址或配对密钥，保留手柄原有的 NS2 配对记录。
@@ -29,7 +31,7 @@ ZL/ZR 是数字扳机，这与手柄硬件一致。当前不输出陀螺仪、�
 
 ## 安装
 
-要求：Windows 10/11、支持 BLE 的蓝牙适配器、Python 3.10+（直接使用打包 EXE 时不需要 Python）。
+正式支持范围：Windows 11 x64、可正常工作的 Bluetooth Low Energy 适配器、允许安装所选输出模式驱动的管理员账户。直接使用打包 EXE 不需要 Python。ARM64、Windows S 模式、企业驱动限制和未来手柄固件的状态见 [`COMPATIBILITY.md`](COMPATIBILITY.md)。
 
 1. Xbox 模式：安装 [ViGEmBus 1.22.0](https://github.com/nefarius/ViGEmBus/releases/tag/v1.22.0)，然后重启电脑。
 2. Nintendo 模式：安装 USBIP 驱动并重启。VIIPER 文档警告旧 usbip-win2 安装包会加入公开测试签名根证书；建议优先阅读 [VIIPER USBIP 安全说明](https://github.com/Alia5/VIIPER/blob/main/docs/getting-started/usbip.md)并考虑 OSSign 的已修复预发布驱动。程序不会自动安装驱动。
@@ -102,7 +104,7 @@ GL/GR 使用 F13/F14 时保持为两个独立输入，可在支持键盘绑定�
 
 版本变更记录见 [`CHANGELOG.md`](CHANGELOG.md)，发布步骤见 [`RELEASING.md`](RELEASING.md)。推送 `v*` Git 标签后，GitHub Actions 会测试、构建 Windows EXE 并创建对应 Release。
 
-`vendor/vgamepad-0.1.0-py3-none-any.whl` 是从官方 MIT 源码包构建的固定 CI 依赖。PyPI 的源码包在生成元数据时会尝试启动交互式 ViGEmBus MSI，无法用于无人值守 Runner；预装 wheel 只跳过该安装副作用，最终 EXE 仍要求用户自行安装 ViGEmBus。
+CI 使用 vgamepad 官方提供的 `VGAMEPAD_SKIP_VIGEMBUS_INSTALL=true` 开关避免在无人值守 Runner 中启动驱动安装器；最终 EXE 仍要求用户自行安装 ViGEmBus。
 
 架构：
 
@@ -128,3 +130,5 @@ protocol.py 解码按钮和摇杆
 - [S2P-XInput-Lite](https://github.com/duoduo-88/S2P-XInput-Lite)（GPL-3.0，公开协议说明与 BLE 节奏对照；本项目未复制其 GPL 源码）
 
 完整署名见 `THIRD_PARTY_NOTICES.md`。
+
+每个正式 Release 的推荐下载是 `NS2ProBridge-vX.Y.Z-Windows-x64.zip`，其中包含 EXE、项目许可证、兼容范围、权利审计、第三方许可和署名；Release 还同时提供 VIIPER 对应提交的完整源码归档、SHA-256 摘要以及 GitHub 构建来源证明。当前 EXE 尚未取得商业 Authenticode 证书，首次下载可能触发 Windows SmartScreen“未知发布者”提示；企业策略可能禁止绕过。哈希和来源证明用于验证文件完整性，但不能替代受信任的 Windows 代码签名。

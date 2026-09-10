@@ -12,6 +12,7 @@ from .protocol import (
     ACK_REPORT_UUID,
     INITIALIZATION_COMMANDS,
     INPUT_REPORT_UUID,
+    NINTENDO_MANUFACTURER_ID,
     PRO_RUMBLE_UUID,
     WRITE_COMMAND_UUID,
     parse_input_report,
@@ -111,11 +112,22 @@ class BridgeWorker:
 
         found = asyncio.Event()
         result: list[Any] = []
+        unsupported_nintendo_adverts: set[str] = set()
 
         def on_advertisement(device: Any, advertisement: Any) -> None:
             if result:
                 return
             if switch2_pro_product_id(advertisement.manufacturer_data) is None:
+                raw = advertisement.manufacturer_data.get(NINTENDO_MANUFACTURER_ID)
+                if raw:
+                    encoded = bytes(raw).hex(" ").upper()
+                    if encoded not in unsupported_nintendo_adverts:
+                        unsupported_nintendo_adverts.add(encoded)
+                        self._emit(
+                            "log",
+                            "发现未识别的 Nintendo BLE 广播："
+                            f"{encoded}。如为官方 NS2 Pro，请随问题报告提交此值。",
+                        )
                 return
             result.append(device)
             found.set()

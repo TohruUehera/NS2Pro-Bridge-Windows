@@ -1,5 +1,11 @@
 # Third-party notices
 
+Packaged license texts are distributed in the `licenses` folder of the
+Windows release archive. Runtime dependency versions used by the official
+v0.6.0 build are: CPython 3.13.15 (PSF License), Tcl/Tk 8.6 (BSD-style),
+Bleak 1.1.1 (MIT), PyWinRT 3.2.1 (MIT), vgamepad 0.1.0 (MIT), and the
+PyInstaller bootloader under its GPL exception for generated executables.
+
 Protocol constants and implementation ideas are derived from the following
 MIT-licensed projects. Their copyright and permission notices are reproduced
 to preserve attribution.
@@ -44,15 +50,20 @@ this MIT-licensed distribution.
 
 ## vgamepad 0.1.0
 
-Xbox virtual-controller output uses and redistributes a wheel built without
-modification from the MIT-licensed `vgamepad` 0.1.0 source distribution by
-Yann Bouteiller. The wheel is pinned under `vendor/` for reproducible,
-non-interactive CI builds.
+Xbox virtual-controller output uses the MIT-licensed `vgamepad` 0.1.0 package
+by Yann Bouteiller. PyInstaller includes its Python modules and x64
+ViGEmClient library in the release executable.
 
 - Source: https://github.com/yannbouteiller/vgamepad
 - PyPI: https://pypi.org/project/vgamepad/0.1.0/
-- Vendored wheel SHA-256:
-  `42D8A9E1532235306C2111EE481867E3DF2F5E02C03C22A06AC7B39D1454E2C5`
+- Copyright (c) 2021 Yann Bouteiller
+- License: MIT (full terms: `licenses/VGAMEPAD-0.1.0-MIT.txt`)
+
+The bundled ViGEmClient library is separately MIT-licensed:
+
+- Source: https://github.com/nefarius/ViGEmClient
+- Copyright (c) 2018 Benjamin Höglinger-Stelzer
+- License: MIT (full terms: `licenses/VIGEMCLIENT-MIT.txt`)
 
 ## VIIPER Haptic v0.8.0 optional runtime
 
@@ -66,6 +77,11 @@ distributed as `runtime/VIIPER_LICENSE.txt` and copied beside packaged builds.
 - Upstream source: https://github.com/Alia5/VIIPER
 - Exact redistributed source tree:
   https://github.com/LeonChrome/XinHeLianSheng-Pro2-Bridge/tree/codex/v6.2.32-stick-calibration-test/tools/viiper/haptic-src
+- Exact source commit: `b274daa6ddd4e81eeb902b8aa465d1b0170b5591`
+- Corresponding source release asset:
+  `XinHeLianSheng-Pro2-Bridge-b274daa-source.zip`
+- Corresponding source SHA-256:
+  `FC47AD79BE7D43B972B10757653C96262F7B5A6BA2EDDB4C0E61A78AEF5D85C3`
 - Runtime SHA-256:
   `F153400F095817AF5056A6658A6EBD93A46F533F0BCD5E5DB3E59B0731278727`
 

@@ -11,7 +11,10 @@ from dataclasses import dataclass
 from typing import Mapping
 
 NINTENDO_MANUFACTURER_ID = 0x0553
-SWITCH2_ADVERTISEMENT_HEADER = bytes((0x01, 0x00, 0x03, 0x7E, 0x05))
+# Byte 4 has changed between observed controller/firmware advertising formats.
+# Keep the Nintendo frame prefix and product ID strict while tolerating that
+# format-revision byte so regional or updated official units are not rejected.
+SWITCH2_ADVERTISEMENT_PREFIX = bytes((0x01, 0x00, 0x03, 0x7E))
 SWITCH2_PRO_PRODUCT_ID = 0x2069
 
 INPUT_REPORT_UUID = "ab7de9be-89fe-49ad-828f-118f09df7fd2"
@@ -97,11 +100,11 @@ def unpack_stick(packed: bytes) -> tuple[int, int]:
 
 
 def switch2_pro_product_id(manufacturer_data: Mapping[int, bytes]) -> int | None:
-    """Return PID 0x2069 only for an authentic-looking Pro Controller advert."""
+    """Return PID 0x2069 for a Nintendo Pro2 advert of any format revision."""
     data = manufacturer_data.get(NINTENDO_MANUFACTURER_ID)
     if data is None or len(data) < 7:
         return None
-    if not data.startswith(SWITCH2_ADVERTISEMENT_HEADER):
+    if not data.startswith(SWITCH2_ADVERTISEMENT_PREFIX):
         return None
     product_id = int.from_bytes(data[5:7], "little")
     return product_id if product_id == SWITCH2_PRO_PRODUCT_ID else None

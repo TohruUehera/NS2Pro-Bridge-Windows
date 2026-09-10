@@ -1,0 +1,45 @@
+name: 兼容性或故障报告
+description: 报告官方 Switch 2 Pro Controller 的连接、输入或震动问题
+title: "[兼容性] "
+labels: [compatibility]
+body:
+  - type: markdown
+    attributes:
+      value: 请勿提交蓝牙配对密钥、账户令牌或其他隐私数据。
+  - type: input
+    id: app-version
+    attributes:
+      label: 应用版本
+      placeholder: v0.6.0
+    validations:
+      required: true
+  - type: input
+    id: controller-firmware
+    attributes:
+      label: 手柄固件版本与购买地区
+      description: 可不知道固件版本，但请说明是否已用 Switch 2 更新。
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows 11 版本、系统架构与蓝牙适配器
+      placeholder: Windows 11 24H2 x64；Intel AX210
+    validations:
+      required: true
+  - type: dropdown
+    id: output
+    attributes:
+      label: 输出模式
+      options:
+        - Xbox 360 / ViGEmBus
+        - Nintendo / VIIPER + USBIP
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: 复现步骤与程序日志
+      description: 若日志显示“未识别的 Nintendo BLE 广播”，请一并提供该十六进制值。
+    validations:
+      required: true

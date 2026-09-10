@@ -14,3 +14,4 @@ Desktop.ini
 # Local driver installers and VIIPER runtime state are not source artifacts.
 runtime/installers/
 runtime/viiper-config/
+third_party/source/*.zip

@@ -7,6 +7,7 @@ if (-not (Test-Path $VenvPython)) {
 }
 
 & $VenvPython -m pip install --upgrade pip
+$env:VGAMEPAD_SKIP_VIGEMBUS_INSTALL = "true"
 & $VenvPython -m pip install -e "$ProjectRoot[dev]"
 
 Write-Host ""
@@ -14,4 +15,3 @@ Write-Host "Python 环境安装完成。"
 Write-Host "还需要 ViGEmBus 1.22.0 驱动："
 Write-Host "https://github.com/nefarius/ViGEmBus/releases/tag/v1.22.0"
 Write-Host "安装驱动并重启电脑后，运行 scripts\run.ps1。"
-

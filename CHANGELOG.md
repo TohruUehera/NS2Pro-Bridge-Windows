@@ -2,6 +2,23 @@
 
 本项目遵循[语义化版本](https://semver.org/lang/zh-CN/)，所有正式版本均使用 Git 标签保存。
 
+## [0.6.0] - 2026-09-10
+
+### 新增
+
+- 增加公开发布前的权利、许可、安全和兼容范围文档。
+- Release 随附 VIIPER 精确对应源码归档，并为 EXE 生成 GitHub 构建来源证明。
+- 增加 Dependabot 和结构化兼容性问题模板。
+- 记录未识别 Nintendo BLE 广播，便于适配未来官方固件。
+
+### 变更
+
+- 广播识别允许官方格式修订字节变化，同时继续严格限定 Nintendo 厂商 ID 与 Pro2 PID。
+- 系统托盘改用 Windows Shell 原生 API，移除 Pillow 和 LGPL pystray 依赖。
+- CI 使用 vgamepad 官方非交互安装开关，不再提交预构建 wheel。
+
+[0.6.0]: https://github.com/TohruUehera/NS2Pro-Bridge-Windows/compare/v0.5.1...v0.6.0
+
 ## [0.5.1] - 2026-09-10
 
 ### 修复

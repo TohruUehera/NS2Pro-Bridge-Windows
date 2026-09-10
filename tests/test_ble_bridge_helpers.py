@@ -26,12 +26,6 @@ def test_cancel_hresult_is_found_through_wrapped_exception() -> None:
     assert _windows_error_is(wrapper, -2147023673)
 
 
-def test_tray_icon_is_rgba_and_windows_icon_sized() -> None:
-    image = BridgeApp._tray_image()
-    assert image.mode == "RGBA"
-    assert image.size == (64, 64)
-
-
 def test_only_active_minimized_window_moves_to_tray() -> None:
     should_hide = BridgeApp._should_hide_to_tray
     assert should_hide("iconic", True, False, False)
