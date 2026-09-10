@@ -1,0 +1,16 @@
+.venv/
+build/
+dist/
+*.spec
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.idea/
+.vscode/
+Thumbs.db
+Desktop.ini
+
+# Local driver installers and VIIPER runtime state are not source artifacts.
+runtime/installers/
+runtime/viiper-config/

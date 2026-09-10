@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ns2pro-bridge"
+dynamic = ["version"]
+description = "Windows BLE bridge for the Nintendo Switch 2 Pro Controller"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "bleak>=1.1,<2",
+    "Pillow>=11,<13",
+    "pystray>=0.19,<1",
+    "vgamepad>=0.1.0,<1",
+    "winrt-Windows.Devices.Radios>=3.1,<4; platform_system == 'Windows'",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "pyinstaller>=6,<7"]
+
+[project.gui-scripts]
+ns2pro-bridge = "ns2pro_bridge.app:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.dynamic]
+version = { attr = "ns2pro_bridge.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
