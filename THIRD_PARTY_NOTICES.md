@@ -2,7 +2,7 @@
 
 Packaged license texts are distributed in the `licenses` folder of the
 Windows release archive. Runtime dependency versions used by the official
-v0.6.0 build are: CPython 3.13.15 (PSF License), Tcl/Tk 8.6 (BSD-style),
+v0.6.1 build are: CPython 3.13.15 (PSF License), Tcl/Tk 8.6 (BSD-style),
 Bleak 1.1.1 (MIT), PyWinRT 3.2.1 (MIT), vgamepad 0.1.0 (MIT), and the
 PyInstaller bootloader under its GPL exception for generated executables.
 

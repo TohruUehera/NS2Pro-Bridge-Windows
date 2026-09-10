@@ -16,10 +16,12 @@ import sys
 import threading
 import time
 from collections.abc import Callable
+from dataclasses import replace
 from pathlib import Path
 
 from .haptics import build_pro_rumble_packet_from_hid_sides
 from .protocol import ControllerState
+from .special_buttons import SPECIAL_BUTTONS, SpecialButtonRouter
 
 VIIPER_HOST = "127.0.0.1"
 VIIPER_API_PORT = 3242
@@ -78,6 +80,16 @@ def controller_state_to_viiper(state: ControllerState, timestamp_us: int = 0) ->
     )
 
 
+def remap_nintendo_specials(
+    state: ControllerState, router: SpecialButtonRouter
+) -> ControllerState:
+    """Replace physical special buttons with configured native/key actions."""
+    pressed = set(state.pressed)
+    pressed.difference_update(SPECIAL_BUTTONS)
+    pressed.update(router.route(state.pressed))
+    return replace(state, pressed=frozenset(pressed))
+
+
 def viiper_feedback_to_ble(data: bytes, counter: int = 0) -> bytes | None:
     """Translate VIIPER's two raw 16-byte rumble sides to Pro2 BLE layout."""
     if len(data) != OUTPUT_WIRE_SIZE:
@@ -134,6 +146,7 @@ class ViiperNintendoPad:
         self,
         output_callback: Callable[[bytes], None] | None = None,
         log_callback: Callable[[str], None] | None = None,
+        special_mappings: dict[str, str] | None = None,
     ) -> None:
         self._output_callback = output_callback
         self._log = log_callback or (lambda _message: None)
@@ -145,6 +158,10 @@ class ViiperNintendoPad:
         self._bus_id: int | None = None
         self._device_id: str | None = None
         self._feedback_counter = 0
+        native_defaults = {button: "native_same" for button in SPECIAL_BUTTONS}
+        self._special_router = SpecialButtonRouter(
+            native_defaults if special_mappings is None else special_mappings
+        )
 
     def _api_request(self, path: str, payload: str | None = None) -> str:
         request = path if not payload else f"{path} {payload}"
@@ -280,12 +297,14 @@ class ViiperNintendoPad:
         if stream is None:
             return
         timestamp_us = time.monotonic_ns() // 1000
-        packet = controller_state_to_viiper(state, timestamp_us)
+        mapped_state = remap_nintendo_specials(state, self._special_router)
+        packet = controller_state_to_viiper(mapped_state, timestamp_us)
         with self._stream_lock:
             stream.sendall(packet)
 
     def close(self) -> None:
         self._stopping.set()
+        self._special_router.reset()
         stream, self._stream = self._stream, None
         if stream is not None:
             try:

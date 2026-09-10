@@ -8,9 +8,12 @@ from ns2pro_bridge.haptics import encode_hd_rumble2_frame
 from ns2pro_bridge.protocol import ControllerState
 from ns2pro_bridge.viiper_nintendo import (
     NINTENDO_BUTTONS,
+    ViiperNintendoPad,
     controller_state_to_viiper,
+    remap_nintendo_specials,
     viiper_feedback_to_ble,
 )
+from ns2pro_bridge.special_buttons import SpecialButtonRouter
 
 
 def test_nintendo_wire_preserves_special_buttons_and_raw_sticks() -> None:
@@ -39,6 +42,70 @@ def test_nintendo_wire_preserves_special_buttons_and_raw_sticks() -> None:
     assert unpacked[:5] == (expected_buttons, 100, 200, 3000, 4000)
     assert unpacked[5:11] == (0, 0, 0, 0, 0, 0)
     assert unpacked[11] == 0x12345678
+
+
+def test_nintendo_special_mapping_replaces_physical_buttons_only() -> None:
+    state = ControllerState(
+        frozenset({"a", "capture", "c", "gl", "gr"}),
+        10,
+        20,
+        30,
+        40,
+        100,
+        200,
+        300,
+        400,
+    )
+    sent: list[tuple[int, ...]] = []
+    router = SpecialButtonRouter(
+        {
+            "capture": "native_c",
+            "c": "key_f12",
+            "gl": "native_same",
+            "gr": "disabled",
+        },
+        sent.append,
+    )
+
+    mapped = remap_nintendo_specials(state, router)
+
+    assert mapped.pressed == frozenset({"a", "c", "gl"})
+    assert mapped.raw_left_x == 100
+    assert mapped.raw_right_y == 400
+    assert len(sent) == 1
+
+
+def test_viiper_pad_applies_native_special_mapping_before_send() -> None:
+    class RecordingStream:
+        def __init__(self) -> None:
+            self.payloads: list[bytes] = []
+
+        def sendall(self, payload: bytes) -> None:
+            self.payloads.append(payload)
+
+    stream = RecordingStream()
+    pad = ViiperNintendoPad(
+        special_mappings={
+            "capture": "native_c",
+            "c": "disabled",
+            "gl": "native_same",
+            "gr": "xinput_guide",
+        }
+    )
+    pad._stream = stream
+    state = ControllerState(
+        frozenset({"capture", "c", "gl", "gr"}), 0, 0, 0, 0
+    )
+
+    pad.update(state)
+    pad._stream = None
+
+    buttons = struct.unpack("<I", stream.payloads[0][:4])[0]
+    assert buttons == (
+        NINTENDO_BUTTONS["c"]
+        | NINTENDO_BUTTONS["gl"]
+        | NINTENDO_BUTTONS["home"]
+    )
 
 
 def test_native_feedback_preserves_both_sixteen_byte_rumble_sides() -> None:

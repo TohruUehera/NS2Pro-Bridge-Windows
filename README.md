@@ -1,6 +1,6 @@
 # NS2 Pro 无线桥接
 
-当前版本：**v0.6.0** · [兼容范围](COMPATIBILITY.md) · [权利与许可审计](LEGAL.md) · [更新日志](CHANGELOG.md)
+当前版本：**v0.6.1** · [兼容范围](COMPATIBILITY.md) · [权利与许可审计](LEGAL.md) · [更新日志](CHANGELOG.md)
 
 让 Nintendo Switch 2 Pro Controller 在 Windows 11 上通过蓝牙连接，并可选择向 Steam/PC 游戏提供虚拟 Xbox 360 手柄，或真正以 USB `VID 057E / PID 2069` 的 Nintendo Switch 2 Pro Controller 身份出现。
 
@@ -15,7 +15,7 @@ Windows “添加蓝牙设备”不显示目标为正常现象：手柄使用 Bl
 - 连接或扫描期间，点击最小化或窗口关闭按钮会隐藏到系统托盘，桥接继续在后台运行；托盘菜单可恢复窗口、释放给 NS2 或完全退出。
 - 采用非持久 GATT 会话，不写电脑地址或配对密钥，保留手柄原有的 NS2 配对记录。
 - 支持 A/B/X/Y、方向键、L/R、ZL/ZR、+/−、HOME、L3/R3 和双摇杆。
-- 支持 C、截图、GL、GR，四者都可单独映射为 F12/F13/F14、Shift+Tab 或现有 XInput 按钮。
+- 支持 C、截图、GL、GR：Xbox 模式可映射为快捷键或现有 XInput 按钮；Nintendo 模式可分别原生直通、互相重映射、映射为 HOME/L/R/L3/R3/−/+、快捷键或禁用。两种模式分别记忆配置。
 - 通过 ViGEmBus 输出虚拟 Xbox 360 手柄，可用于 Steam 和普通 XInput 游戏。
 - 可选的“VIIPER 原生”模式通过 USBIP 输出 Nintendo Switch 2 Pro 身份，原生保留 C、截图、GL、GR，并接收 Steam/SDL 的左右 HD Rumble 2 输出。
 - 默认“任天堂字母”映射：实体 A 输出逻辑 A、实体 B 输出逻辑 B；也可切换为 Xbox 按键位置。
@@ -61,7 +61,9 @@ ZL/ZR 是数字扳机，这与手柄硬件一致。当前不输出陀螺仪、�
 
 若选择“ Nintendo Switch 2 Pro（VIIPER 原生）”，Steam 应看到 Nintendo Switch 2 Pro Controller；此时建议为它启用 Steam Input，以便 Steam/SDL 处理 C、截图、GL/GR 和 Nintendo 原始震动输出。游戏若原生支持该设备，也可按游戏情况关闭 Steam Input 对比测试。
 
-默认特殊键映射：
+Nintendo 模式下四个特殊键默认均为“原生直通”。例如可把实体 C 改成“原生 GL”，把实体截图键改成 F12，或把 GR 改成 HOME。选择快捷键或“禁用”时，原来的 Nintendo 按键位不会同时上报，因此不会产生双重输入。连接期间配置锁定；先“释放给 NS2”后即可修改。
+
+Xbox 模式默认特殊键映射：
 
 - 截图 → `F12`（Steam 默认截图键）
 - C → `Shift+Tab`（Steam 默认界面快捷键）

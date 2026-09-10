@@ -2,6 +2,20 @@
 
 本项目遵循[语义化版本](https://semver.org/lang/zh-CN/)，所有正式版本均使用 Git 标签保存。
 
+## [0.6.1] - 2026-09-11
+
+### 新增
+
+- Nintendo/VIIPER 原生模式允许分别自定义截图、C、GL、GR。
+- 每个特殊键可选择原生直通、映射为其他原生特殊键、HOME/L/R/L3/R3/−/+、F12/F13/F14、Shift+Tab 或禁用。
+- Xbox 与 Nintendo 模式分别记忆各自的特殊键配置。
+
+### 修复
+
+- 在 Nintendo 模式启用特殊键下拉框；非直通映射会抑制原始键位，避免双重输入。
+
+[0.6.1]: https://github.com/TohruUehera/NS2Pro-Bridge-Windows/compare/v0.6.0...v0.6.1
+
 ## [0.6.0] - 2026-09-10
 
 ### 新增

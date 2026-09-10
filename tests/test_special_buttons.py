@@ -31,3 +31,22 @@ def test_disabled_and_unknown_actions_do_nothing() -> None:
     )
     assert router.route({"capture", "c"}) == set()
     assert sent == []
+
+
+def test_native_special_buttons_can_pass_through_or_remap() -> None:
+    router = SpecialButtonRouter(
+        {
+            "capture": "native_same",
+            "c": "native_gl",
+            "gl": "native_c",
+            "gr": "xinput_guide",
+        },
+        lambda _keys: None,
+    )
+
+    assert router.route({"capture", "c", "gl", "gr"}) == {
+        "capture",
+        "gl",
+        "c",
+        "home",
+    }

@@ -13,7 +13,7 @@ from tkinter.scrolledtext import ScrolledText
 
 from . import __version__
 from .ble_bridge import BridgeWorker
-from .special_buttons import DEFAULT_SPECIAL_MAPPINGS
+from .special_buttons import DEFAULT_SPECIAL_MAPPINGS, SPECIAL_BUTTONS
 from .tray import WindowsTrayIcon
 
 VIGEM_URL = "https://github.com/nefarius/ViGEmBus/releases/tag/v1.22.0"
@@ -24,7 +24,7 @@ OUTPUT_LABELS = {
     "Nintendo Switch 2 Pro（VIIPER 原生）": "nintendo",
 }
 
-SPECIAL_ACTION_LABELS = {
+XBOX_SPECIAL_ACTION_LABELS = {
     "禁用": "disabled",
     "F12": "key_f12",
     "F13": "key_f13",
@@ -38,7 +38,25 @@ SPECIAL_ACTION_LABELS = {
     "View/Back": "xinput_view",
     "Menu/Start": "xinput_menu",
 }
-ACTION_TO_LABEL = {value: key for key, value in SPECIAL_ACTION_LABELS.items()}
+NINTENDO_SPECIAL_ACTION_LABELS = {
+    "原生直通": "native_same",
+    "原生截图": "native_capture",
+    "原生 C": "native_c",
+    "原生 GL": "native_gl",
+    "原生 GR": "native_gr",
+    "禁用": "disabled",
+    "F12": "key_f12",
+    "F13": "key_f13",
+    "F14": "key_f14",
+    "Shift+Tab": "key_shift_tab",
+    "HOME": "xinput_guide",
+    "L": "xinput_lb",
+    "R": "xinput_rb",
+    "左摇杆按下": "xinput_l3",
+    "右摇杆按下": "xinput_r3",
+    "−": "xinput_view",
+    "+": "xinput_menu",
+}
 
 XBOX_HAPTIC_LABELS = {
     "HD2 均衡（推荐，最高 49%）": "balanced",
@@ -78,6 +96,11 @@ class BridgeApp(tk.Tk):
         self._tray_icon = None
         self._hidden_to_tray = False
         self._exiting = False
+        self._special_mode = "xbox"
+        self._special_selections = {
+            "xbox": dict(DEFAULT_SPECIAL_MAPPINGS),
+            "nintendo": {button: "native_same" for button in SPECIAL_BUTTONS},
+        }
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(6, weight=1)
@@ -133,7 +156,7 @@ class BridgeApp(tk.Tk):
         self._runtime_button = ttk.Button(control, text="ViGEmBus", command=self._open_runtime_help)
         self._runtime_button.grid(row=0, column=4, rowspan=2, padx=(12, 0))
 
-        self._special_frame = ttk.LabelFrame(self, text="特殊按键（Xbox 模式可独立修改）")
+        self._special_frame = ttk.LabelFrame(self, text="特殊按键（Xbox 模式）")
         self._special_frame.grid(row=3, column=0, sticky="ew", padx=18, pady=(12, 0))
         self._special_boxes: dict[str, ttk.Combobox] = {}
         for column, (button, label) in enumerate(
@@ -146,10 +169,10 @@ class BridgeApp(tk.Tk):
                 group,
                 state="readonly",
                 width=13,
-                values=tuple(SPECIAL_ACTION_LABELS),
+                values=tuple(XBOX_SPECIAL_ACTION_LABELS),
             )
             default_action = DEFAULT_SPECIAL_MAPPINGS[button]
-            box.set(ACTION_TO_LABEL[default_action])
+            box.set(self._action_to_label("xbox", default_action))
             box.pack(side="left")
             self._special_boxes[button] = box
 
@@ -217,9 +240,10 @@ class BridgeApp(tk.Tk):
             return
         output_mode = OUTPUT_LABELS[self._output.get()]
         layout = "nintendo" if self._layout.current() == 0 else "xbox"
+        self._remember_special_selections(output_mode)
+        labels = self._special_labels(output_mode)
         special_mappings = {
-            button: SPECIAL_ACTION_LABELS[box.get()]
-            for button, box in self._special_boxes.items()
+            button: labels[box.get()] for button, box in self._special_boxes.items()
         }
         haptic_labels = (
             NINTENDO_HAPTIC_LABELS if output_mode == "nintendo" else XBOX_HAPTIC_LABELS
@@ -271,7 +295,40 @@ class BridgeApp(tk.Tk):
             self._refresh_output_controls()
 
     def _on_output_changed(self, _event=None) -> None:
+        output_mode = OUTPUT_LABELS[self._output.get()]
+        if output_mode != self._special_mode:
+            self._remember_special_selections(self._special_mode)
+            self._special_mode = output_mode
+            self._apply_special_selections(output_mode)
         self._refresh_output_controls()
+
+    @staticmethod
+    def _special_labels(output_mode: str) -> dict[str, str]:
+        return (
+            NINTENDO_SPECIAL_ACTION_LABELS
+            if output_mode == "nintendo"
+            else XBOX_SPECIAL_ACTION_LABELS
+        )
+
+    @classmethod
+    def _action_to_label(cls, output_mode: str, action: str) -> str:
+        labels = cls._special_labels(output_mode)
+        return next(label for label, value in labels.items() if value == action)
+
+    def _remember_special_selections(self, output_mode: str) -> None:
+        labels = self._special_labels(output_mode)
+        selections = self._special_selections[output_mode]
+        for button, box in self._special_boxes.items():
+            label = box.get()
+            if label in labels:
+                selections[button] = labels[label]
+
+    def _apply_special_selections(self, output_mode: str) -> None:
+        labels = self._special_labels(output_mode)
+        for button, box in self._special_boxes.items():
+            box.configure(values=tuple(labels))
+            action = self._special_selections[output_mode][button]
+            box.set(self._action_to_label(output_mode, action))
 
     def _refresh_output_controls(self) -> None:
         if self._worker is not None and self._worker.running:
@@ -280,18 +337,23 @@ class BridgeApp(tk.Tk):
         if native:
             self._layout.configure(state="disabled")
             for box in self._special_boxes.values():
-                box.configure(state="disabled")
+                box.configure(state="readonly")
+            self._special_frame.configure(text="特殊按键（Nintendo 原生直通/改键/快捷键）")
             self._haptic.configure(values=tuple(NINTENDO_HAPTIC_LABELS), state="readonly")
             self._haptic.current(0)
             self._haptic_hint.configure(text="Steam/SDL 原始 Nintendo 输出报告 → BLE 原生波形")
             self._runtime_button.configure(text="VIIPER/USBIP")
             self._footer.configure(
-                text="Nintendo 模式原生输出 C/截图/GL/GR；需要 VIIPER Haptic v0.8.0 与 USBIP 驱动。"
+                text=(
+                    "Nintendo 模式可分别直通、重映射或禁用 C/截图/GL/GR；"
+                    "需要 VIIPER Haptic v0.8.0 与 USBIP 驱动。"
+                )
             )
         else:
             self._layout.configure(state="readonly")
             for box in self._special_boxes.values():
                 box.configure(state="readonly")
+            self._special_frame.configure(text="特殊按键（Xbox 模式）")
             self._haptic.configure(values=tuple(XBOX_HAPTIC_LABELS), state="readonly")
             self._haptic.current(0)
             self._haptic_hint.configure(text="XInput 双频反馈 → HD Rumble 2；并非游戏原生波形透传")

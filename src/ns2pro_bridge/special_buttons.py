@@ -17,6 +17,13 @@ XINPUT_ACTIONS = {
     "xinput_menu": "plus",
 }
 
+NINTENDO_ACTIONS = {
+    "native_capture": "capture",
+    "native_c": "c",
+    "native_gl": "gl",
+    "native_gr": "gr",
+}
+
 KEY_CHORDS = {
     "key_f12": (0x7B,),
     "key_f13": (0x7C,),
@@ -47,7 +54,7 @@ def send_windows_key_chord(keys: tuple[int, ...]) -> None:
 
 
 class SpecialButtonRouter:
-    """Edge-trigger keyboard actions and return held XInput aliases."""
+    """Edge-trigger keyboard actions and return held virtual-button aliases."""
 
     def __init__(
         self,
@@ -68,7 +75,9 @@ class SpecialButtonRouter:
             if physical not in special_pressed:
                 continue
             action = self._mappings.get(physical, "disabled")
-            alias = XINPUT_ACTIONS.get(action)
+            alias = XINPUT_ACTIONS.get(action) or NINTENDO_ACTIONS.get(action)
+            if action == "native_same":
+                alias = physical
             if alias is not None:
                 aliases.add(alias)
 

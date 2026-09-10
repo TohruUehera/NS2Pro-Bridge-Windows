@@ -293,6 +293,7 @@ class BridgeWorker:
                     else None
                 ),
                 log_callback=lambda message: self._emit("log", message),
+                special_mappings=self._special_mappings,
             )
             try:
                 await asyncio.to_thread(gamepad.start)

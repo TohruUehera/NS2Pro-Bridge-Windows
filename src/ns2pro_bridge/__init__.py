@@ -1,3 +1,3 @@
 """Nintendo Switch 2 Pro Controller Bluetooth bridge."""
 
-__version__ = "0.6.0"
+__version__ = "0.6.1"
