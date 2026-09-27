@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 dependencies = [
-    "bleak==1.1.1",
+    "bleak==3.0.2",
     "vgamepad==0.1.0",
     "winrt-Windows.Devices.Radios==3.2.1; platform_system == 'Windows'",
 ]
